@@ -1,10 +1,10 @@
-# Oracle Database 19c QSG for EXPRESSCLUSTER X (Linux data mirror)
+# Oracle Database 19c QSG for EXPRESSCLUSTER X
 
 ## About This Guide
 
-This guide helps you to integrate Oracle Database 19c with 2 mirror nodes using the EXPRESSCLUSTER X (ECX).The guide is only for those who have basic understanding,knowledge and setup skills of EXPRESSCLUSTER X.
+This guide helps you to integrate Oracle Database 19c with 2 mirror nodes using the EXPRESSCLUSTER X (ECX). The guide is only for those who have basic understanding,knowledge and setup skills of EXPRESSCLUSTER X.
 
-For the detailed information of EXPRESSCLUSTER X, please refer to [this site](https://www.nec.com/en/global/prod/expresscluster/index.html) .
+For the detailed information of EXPRESSCLUSTER X, please refer to [this site](https://www.nec.com/en/global/prod/expresscluster/index.html).
 
 
 ## Configurations Description
@@ -73,6 +73,7 @@ Prepare Oracle HA By using EXPRESSCLUSTER X.
   - If you want to know how to add resource, please refer to [this site](https://github.com/EXPRESSCLUSTER/BasicCluster/blob/master/X41/Lin/2nodesMirror_Lin.md#how-to-setup-basic-2-nodes-mirror-cluster-on-linux) 
                                                           
  OR
+ 
   - please refer to how to setup basic 2 nodes mirror cluster on Linux [this site](https://github.com/EXPRESSCLUSTER/BasicCluster/blob/master/X41/Lin/2nodesMirror_Lin.md)
 
 
@@ -84,13 +85,13 @@ Prepare Oracle HA By using EXPRESSCLUSTER X.
 - Database files location: `/oradata/ORCL`
 
 
-## Moving Oracle Database File to the Mirror Data Partition
+## Moving Oracle Database Files to the Mirror Disk Partition
 
 ### Changing the location of the Database files (*.DBF) on the Primary Server
 
 - All the default  (*.DBF) file path is /u01/app/oracle/oradata/ORCL2
 
-- Switch to oracle user and export the ORACLE_SID environment      variable to target SID (example: orcl):
+- Switch to oracle user and export the ORACLE_SID environment variable to target SID (example: orcl):
            
          export ORACLE_SID= orcl
 
@@ -115,61 +116,55 @@ Prepare Oracle HA By using EXPRESSCLUSTER X.
    - Database dismounted.
    - ORACLE instance shut down.
 
- - Copy the database (*.DBF) files from default directory to    mirrored disk directory Some typical database files include the following:
+ - Copy the database (*.DBF) files from default directory to mirrored disk directory Some typical database files include the following:
   
    - SYSAUX01.DBF
    - SYSTEM01.DBF
    - UNDOTBS01.DBF
    - USERS01.DBF
            
-          1) scp -r  /u01/app/oracle/oradata/ORCL/sysaux01.dbf    /oradata/ORCL/
+           scp -r  /u01/app/oracle/oradata/ORCL/sysaux01.dbf   /oradata/ORCL/
 
-          2) scp -r  /u01/app/oracle/oradata/ORCL/system01.dbf    /oradata/ORCL/
+           scp -r  /u01/app/oracle/oradata/ORCL/system01.dbf   /oradata/ORCL/
 
-          3) scp -r  /u01/app/oracle/oradata/ORCL/users01.dbf    /oradata/ORCL/
+           scp -r  /u01/app/oracle/oradata/ORCL/users01.dbf    /oradata/ORCL/
 
-          4) scp -r  /u01/app/oracle/oradata/ORCL/undotbs01.dbf    /oradata/ORCL/
+           scp -r  /u01/app/oracle/oradata/ORCL/undotbs01.dbf  /oradata/ORCL/
 
 
-
- ### Note:
-     Do not copy the file TEMP01.DBF at this time.
-
-- Restart and mount target database instance:
+- Start and mount database instance:
        
        SQL> startup mount
 
-- Set new location of the database (*.DBF) files by executing the following command for all moved database files:
+- Alter database (*.DBF) files by executing the following command for all moved database files:
 
 ## SYNTAX 
-SQL> alter database move datafile
- 'original file path' to 'new file path';
+   SQL> alter database move datafile 'original file path' to 'new file path';
 
 Example: 
 
+
      SQL> alter database move datafile '/u01/app/oracle/oradata/ORCL/users01.dbf' to '/oradata/ORCL/users01.dbf';
+     
+  --> Database altered.
 
-  -->  Database altered.
-
-     SQL> alter database move datafile '/u01/app/oracle/oradata/ORCL/sysaux01.dbf' to '/oradata/ORCL/sysaux01.dbf';
-
+      SQL> alter database move datafile '/u01/app/oracle/oradata/ORCL/sysaux01.dbf' to '/oradata/ORCL/sysaux01.dbf';
+     
   --> Database altered.
 
      SQL> alter database move datafile '/u01/app/oracle/oradata/ORCL/system01.dbf' to '/oradata/ORCL/system01.dbf';
+     
+  --> Database altered.
+
+      SQL> alter database move datafile '/u01/app/oracle/oradata/ORCL/undotbs01.dbf' to '/oradata/ORCL/undotbs01.dbf';
 
   --> Database altered.
 
-     SQL> alter database move datafile '/u01/app/oracle/oradata/ORCL/undotbs01.dbf' to '/oradata/ORCL/undotbs01.dbf';
-
-  --> Database altered.
-
- - Open target database instance:
+ - Open alter database instance:
       
         SQL> alter database open;
 
-You should see the status at the SQL prompt as:
-
-Database altered.
+  --> Database altered.
 
 - Verify new database file locations:
     
@@ -180,16 +175,12 @@ Database altered.
 
 - Create new temporary database file by executing the following command at the prompt:
 
-
         SQL> create temporary tablespace temp2 tempfile '/oradata/ORCL/temp02.dbf' size 50M extent management local;
 
    --> Tablespace created.
 
   - Adjust the command options as per need.
 
-- See the status at the SQL prompt as:
-
-  --> Tablespace created.
 
 - Configure new default temporary database file by executing the following command at the prompt:
 
@@ -208,10 +199,8 @@ Database altered.
 
       --> Tablespace altered.
 
-### This completes the re-configuration of the database (*.DBF) files to the mirror partition \oradata.
 
-
-## Changing the location of the log files (*.log) on the Primary Server 
+## Changing the location of the log (*.log) database files
 
 - Shutdown target database instance:
      
@@ -242,7 +231,7 @@ EXAMPLE :-
        
         SQL> startup mount        
 
-  - Set new location of the log files by executing the following command pattern for all moved log files:
+  - Alter log database files by executing the following command pattern for all moved log files:
 
   EXAMPLE:- 
 
@@ -253,17 +242,17 @@ EXAMPLE :-
         SQL>  alter database rename file '/u01/app/oracle/oradata/ORCL/redo03.log' to '/oradata/ORCL/redo03.log';    
 
 
--  Reopen target database instance:
+-  Reopen database instance:
         
-         SQL> alter database open;
+        SQL> alter database open;
 
 -  Check log file location 
 
-       SQL>  select * from v$logfile;       
+        SQL>  select * from v$logfile;       
 
- #### Completed the re-configuration of the log files to the mirror partition \oradata.      
+  
 
- ## Changing the location of the Control files (*.ctl) on the Primary Server
+ ## Changing the location of the Control (*.ctl) database files
 
  - Shutdown target database instance:
      
@@ -279,7 +268,7 @@ EXAMPLE :-
 
      --> File created.
 
- - Switch to rrot user and Copy control (*.CTL) files from default directories to Oracle instance data directory on the mirrored disk (example: /oradata/orcl). Typically, the database control files include the following:
+ - Switch to root user and Copy control (*.CTL) files from default directories to Oracle instance data directory on the mirrored disk (example: /oradata/orcl). Typically, the database control files include the following:
 
      - CONTROL01.CTL
      - CONTROL02.CTL  
@@ -292,11 +281,10 @@ EXAMPLE :-
 
             [root@db1 ORCL]# chown oracle:oinstall control02.ctl
 
-- After 
+- After that go in the path /home/oracle/dbs/initorcl.ora and edit control files location as MD
                       
       [root@db1 ~]# find /home -name initorcl.ora
-/home/oracle/dbs/initorcl.ora
-
+      
 
           [oracle@db1 dbs]$ vi initorcl.ora
           ----------------------------------------------------
@@ -305,7 +293,7 @@ EXAMPLE :-
               
    -  Edit the newly created PFILE and change directory paths in for the parameter “control_files” to the mirrored disk path.
 
-- Restart target database instance with new parameter file:
+- Start database instance with new parameter file:
 
        SQL> startup
 
@@ -332,3 +320,33 @@ sqlplus /nolog
 
 conn / as sysdba
 
+### Changing the location of the Database files (*.DBF) on the Standby Server
+
+- All the default  (*.DBF) file path is /u01/app/oracle/oradata/ORCL2
+
+      SQL>Shutdown immediate;
+ 
+- Copy pfile from primary server and replace in standby server then create spfile from pfile. E.g. (/home/oracle/dbs/initorcl.ora)
+ 
+      SQL> create spfile from pfile;
+      SQL> Startup;
+      
+- Verify control file location changes:
+ 
+      SQL> show parameter control_files;
+
+- Verify new database file locations:
+
+      SQL> select name from v$datafile;
+      
+- Verify new database file locations:
+  
+      SQL> select *  from v$logfile;
+
+#### Set Listner on both the servers
+- Replace the Hostname with the Virtual Computer Name in the “Listener.ora” "tnsnames.ora" file (/home/oracle/network/admin) to allow make the connection remotely on all the nodes in the cluster.
+
+### Create Systemd file
+-
+### Create Exec reouce for oracle service
+-
